@@ -42,7 +42,7 @@ for change in changer_files(path.abspath(repo_path)):
     extra_args += "--path {0} ".format(path.abspath(path.join(repo_path, change)))
 
 if extra_args:
-    cmd = "run_pylint.py -c {0} {1}".format(config_file, extra_args)
+    cmd = "run_pylint.py --extra-params --load-plugins=pylint_odoo --extra-params --enable=sql-injection -c {0} {1} ".format(config_file, extra_args)
     res = os.system(cmd)
     if res > 0:
         exit(1)

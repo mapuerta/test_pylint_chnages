@@ -44,7 +44,8 @@ for change in changer_files(path.abspath(repo_path)):
 if extra_args:
     cmd = "run_pylint.py -c {0} {1}".format(config_file, extra_args)
     res = os.system(cmd)
-    sys.exit(res)
+    if res > 0:
+        exit(1)
 else:
     print(bcolors.OKGREEN+"There are no changes to review...good"+bcolors.ENDC)
 

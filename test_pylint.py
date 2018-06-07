@@ -89,6 +89,7 @@ if file_paths:
     cmd = "run_pylint.py {0} -c {1} {2} ".format(extra_params, config_file, file_paths)
     res = os.system(cmd)
     if res > 0:
+        print(bcolors.FAIL+"Multiple lines with lints...fail"+bcolors.ENDC)
         exit(1)
 else:
     print(bcolors.OKGREEN+"There are no changes to review...good"+bcolors.ENDC)

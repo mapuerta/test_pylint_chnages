@@ -73,7 +73,6 @@ def changer_files(repo_path):
     if isinstance(res, string_types):
         res = res.strip('\n')
     res = res.splitlines()
-    res = res[6:-1]
     res = [path.dirname(i).split('/')[0] for i in res]
     res = list(set(res))
     return res

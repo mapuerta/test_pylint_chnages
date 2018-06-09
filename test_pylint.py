@@ -93,5 +93,4 @@ if modules:
             "pylint expected errors found {0}!".format(count_errors)))
 else:
     print(travis_helpers.green("Good...!!"))
-
- exit(status)
+exit(status)

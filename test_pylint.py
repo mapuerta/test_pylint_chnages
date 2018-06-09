@@ -6,6 +6,13 @@ import sys
 from os import path
 import os
 
+home = os.environ.get('HOME')
+travis_path = path.join(home, 'maintainer-quality-tools/travis')
+sys.path.append(travis_path)
+
+import run_pylint
+import travis_helpers
+
 extra_params = [
     '--extra-params', '--load-plugins=pylint_odoo', '--extra-params',
     '--valid_odoo_versions=11.0', '--msgs-no-count', 'api-one-deprecated',
@@ -49,17 +56,6 @@ extra_params = [
     '--extra-params', '--enable=xml-syntax-error'] 
 
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-
 def changer_files(repo_path):
     base_ref = os.environ.get('TRAVIS_BRANCH', 'master')
     git_cmd = ['diff-index', '--name-only', '--cached', base_ref]
@@ -77,21 +73,22 @@ def changer_files(repo_path):
     res = list(set(res))
     return res
 
-extra_params = " ".join(extra_params)
 config_file = path.abspath(sys.argv[1])
 repo_path = os.environ.get('TRAVIS_BUILD_DIR', False)
-file_paths = ''
+modules = []
 for change in changer_files(path.abspath(repo_path)):
     if not change:
         continue
-    file_paths += "--path {0} ".format(path.abspath(path.join(repo_path, change)))
-
-if file_paths:
-    cmd = "run_pylint.py {0} -c {1} {2} ".format(extra_params, config_file, file_paths)
-    res = os.system(cmd)
-    if res > 0:
-        print(bcolors.FAIL+"Multiple lines with lints...fail"+bcolors.ENDC)
+    modules.extend(['--path', change])
+if modules:
+    conf = ["--config-file=%s" % (config_file)]
+    cmd = conf + modules + extra_params
+    res = run_pylint.main(cmd, standalone_mode=False)
+    count_errors = run_pylint.get_count_fails(res, [])
+    if count_errors> 0:
+        print(travis_helpers.red(
+            "pylint expected errors found {0}!".format(count_errors)))
         exit(1)
 else:
-    print(bcolors.OKGREEN+"There are no changes to review...good"+bcolors.ENDC)
+    print(travis_helpers.green("Good...!!"))
 

@@ -75,7 +75,9 @@ def changer_files(repo_path):
 
 config_file = path.abspath(sys.argv[1])
 repo_path = os.environ.get('TRAVIS_BUILD_DIR', False)
+expected_errors = int(os.environ.get('PYLINT_EXPECTED_ERRORS', 0))
 modules = []
+status = 0
 for change in changer_files(path.abspath(repo_path)):
     if not change:
         continue
@@ -85,10 +87,11 @@ if modules:
     cmd = conf + modules + extra_params
     res = run_pylint.main(cmd, standalone_mode=False)
     count_errors = run_pylint.get_count_fails(res, [])
-    if count_errors> 0:
+    if count_errors and count_errors != expected_errors:
+        status = 1
         print(travis_helpers.red(
             "pylint expected errors found {0}!".format(count_errors)))
-        exit(1)
 else:
     print(travis_helpers.green("Good...!!"))
 
+ exit(status)

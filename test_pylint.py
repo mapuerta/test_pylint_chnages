@@ -58,7 +58,7 @@ extra_params = [
 
 def changer_files(repo_path):
     base_ref = os.environ.get('TRAVIS_BRANCH', 'master')
-    git_cmd = ['diff-index', '--name-only', '--cached', base_ref]
+    git_cmd = ['diff-index', '--name-only', '--cached', '--diff-filter', "d", base_ref]
     cmd = ['git', '--git-dir=' + path.join(repo_path, '.git')] + git_cmd
     try:
         res = subprocess.check_output(cmd)
